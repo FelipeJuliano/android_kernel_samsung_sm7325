@@ -493,7 +493,9 @@ KBUILD_CFLAGS   := -Wall -Wundef -Werror=strict-prototypes -Wno-trigraphs \
 		   -fno-strict-aliasing -fno-common -fshort-wchar -fno-PIE \
 		   -Werror=implicit-function-declaration -Werror=implicit-int \
 		   -Wno-logical-op-parentheses\
-		   -Wframe-larger-than=\
+		   -Wno-frame-larger-than=\
+		   -Wno-address-of-packed-member\
+		    -Wno-misleading-indentation\
 		   -Werror=return-type -Wno-format-security \
 		   -std=gnu89
 KBUILD_CPPFLAGS := -D__KERNEL__
