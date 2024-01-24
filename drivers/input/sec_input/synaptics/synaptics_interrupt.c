@@ -88,10 +88,14 @@ static void synaptics_ts_gesture_event(struct synaptics_ts_data *ts, u8 *event_b
 			sec_input_gesture_report(&ts->client->dev, SPONGE_EVENT_TYPE_FOD_PRESS, x, y);
 			input_info(true, &ts->client->dev, "%s: FOD %sPRESS\n",
 					__func__, p_gesture_status->gesture_id ? "" : "LONG");
+			ts->fod_pressed = true;
+			sysfs_notify(&ts->plat_data->input_dev->dev.kobj, NULL, "fod_pressed");
 		} else if (p_gesture_status->gesture_id == SYNAPTICS_TS_GESTURE_ID_FOD_RELEASE) {
 			sec_input_gesture_report(&ts->client->dev, SPONGE_EVENT_TYPE_FOD_RELEASE, x, y);
 			input_info(true, &ts->client->dev, "%s: FOD RELEASE\n", __func__);
 			memset(ts->plat_data->fod_data.vi_data, 0x0, ts->plat_data->fod_data.vi_size);
+			ts->fod_pressed = false;
+			sysfs_notify(&ts->plat_data->input_dev->dev.kobj, NULL, "fod_pressed");
 		} else if (p_gesture_status->gesture_id == SYNAPTICS_TS_GESTURE_ID_FOD_OUT) {
 			sec_input_gesture_report(&ts->client->dev, SPONGE_EVENT_TYPE_FOD_OUT, x, y);
 			input_info(true, &ts->client->dev, "%s: FOD OUT\n", __func__);
@@ -169,8 +173,10 @@ static void synaptics_ts_status_event(struct synaptics_ts_data *ts, u8 *event_bu
 				event_buff[6], event_buff[7]);
 
 	if (p_event_status->stype == SYNAPTICS_TS_TOUCHTYPE_PROXIMITY) {
-		if (p_event_status->status_id == SYNAPTICS_TS_STATUS_EVENT_VENDOR_PROXIMITY)
+		if (p_event_status->status_id == SYNAPTICS_TS_STATUS_EVENT_VENDOR_PROXIMITY) {
+			ts->hover_event = p_event_status->status_data_1;
 			sec_input_proximity_report(&ts->client->dev, p_event_status->status_data_1);
+		}
 	}
 
 #if 0
